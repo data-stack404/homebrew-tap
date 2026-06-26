@@ -1,6 +1,8 @@
 # Documentation: https://docs.brew.sh/Formula-Cookbook
 #                https://docs.brew.sh/rubydoc/Formula
 # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
+require "language/node"
+
 class MdChangelogLinter < Formula
   desc "A simple markdown linter to create high-quality changelogs"
   homepage "https://github.com/data-stack404/md-changelog-linter"
@@ -11,8 +13,16 @@ class MdChangelogLinter < Formula
   depends_on "node"
 
   def install
+    # If the project provides a build script, run it to generate the dist/ folder.
+    if (buildpath/"package.json").exist? && (buildpath/"package.json").read.include?("\"build\"")
+      system "npm", "run", "build"
+    end
+
     # Use Language::Node helper to install into libexec in the Homebrew way.
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+
+    # If a prebuilt dist/ directory exists in the repository after building, install it into libexec
+    libexec.install "dist" if (buildpath/"dist").exist?
 
     # Symlink executables
     bin.install_symlink Dir["#{libexec}/bin/*"]
