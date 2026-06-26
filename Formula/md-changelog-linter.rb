@@ -11,11 +11,6 @@ class MdChangelogLinter < Formula
   depends_on "node"
 
   def install
-    # If the project needs a build step, run it so `dist/` is created.
-    # Many projects have build scripts defined in package.json; running this
-    # explicitly ensures the output exists before install.
-    system "npm", "run", "build" if (buildpath/"package.json").exist?
-
     # Use Language::Node helper to install into libexec in the Homebrew way.
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
 
