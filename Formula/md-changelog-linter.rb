@@ -4,8 +4,8 @@
 class MdChangelogLinter < Formula
   desc "A simple markdown linter to create high-quality changelogs"
   homepage "https://github.com/data-stack404/md-changelog-linter"
-  url "https://github.com/data-stack404/md-changelog-linter/archive/refs/tags/1.1.0.tar.gz"
-  sha256 "78de633b317cf78d005b76d7263b1ae5e3220054f8f55cb0da6564c81c3a6584"
+  url "https://github.com/data-stack404/md-changelog-linter/archive/refs/tags/1.1.1.tar.gz"
+  sha256 "e3bb51c3370990c3af53d81537f2593dbd88d14c4acb949ab2469d7b0da04e5d"
   license "MIT"
 
   depends_on "node"
