@@ -10,27 +10,23 @@ class MdChangelogLinter < Formula
 
   depends_on "node"
 
-  # Additional dependency
-  # resource "" do
-  #   url ""
-  #   sha256 ""
-  # end
-
   def install
-    system "npm", "install", *std_npm_args
-    bin.install_symlink libexec.glob("bin/*")
+    # If the project needs a build step, run it so `dist/` is created.
+    # Many projects have build scripts defined in package.json; running this
+    # explicitly ensures the output exists before install.
+    system "npm", "run", "build" if (buildpath/"package.json").exist?
+
+    # Use Language::Node helper to install into libexec in the Homebrew way.
+    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+
+    # Symlink executables
+    bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   test do
-    # `test do` will create, run in and delete a temporary directory.
-    #
-    # This test will fail and we won't accept that! For Homebrew/homebrew-core
-    # this will need to be a test that verifies the functionality of the
-    # software. Run the test with `brew test md-changelog-linter`. Options passed
-    # to `brew install` such as `--HEAD` also need to be provided to `brew test`.
-    #
-    # The installed folder is not in the path, so use the entire path to any
-    # executables being tested: `system bin/"program", "do", "something"`.
-    system "false"
+    # Basic sanity check: ensure the binary runs and prints a help/version line.
+    # Adjust the --version/--help flag according to the CLI's available options.
+    assert_predicate bin/"md-changelog-linter", :exist?
+    system "#{bin}/md-changelog-linter", "CHANGELOG.md"
   end
 end
