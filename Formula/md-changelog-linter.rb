@@ -13,16 +13,12 @@ class MdChangelogLinter < Formula
   depends_on "node"
 
   def install
-    # If the project provides a build script, run it to generate the dist/ folder.
-    if (buildpath/"package.json").exist? && (buildpath/"package.json").read.include?("\"build\"")
-      system "npm", "run", "build"
-    end
-
-    # Use Language::Node helper to install into libexec in the Homebrew way.
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
-
-    # If a prebuilt dist/ directory exists in the repository after building, install it into libexec
+    # The repository already includes a prebuilt dist/ directory. Install it into libexec so
+    # runtime assets are available to the CLI without running a build step.
     libexec.install "dist" if (buildpath/"dist").exist?
+
+    # Use Language::Node helper to install node_modules into libexec in the Homebrew way.
+    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
 
     # Symlink executables
     bin.install_symlink Dir["#{libexec}/bin/*"]
