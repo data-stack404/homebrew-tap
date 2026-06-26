@@ -2,6 +2,7 @@
 #                https://docs.brew.sh/rubydoc/Formula
 # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 require "language/node"
+require "fileutils"
 
 class MdChangelogLinter < Formula
   desc "A simple markdown linter to create high-quality changelogs"
@@ -13,12 +14,16 @@ class MdChangelogLinter < Formula
   depends_on "node"
 
   def install
-    # The repository already includes a prebuilt dist/ directory. Install it into libexec so
-    # runtime assets are available to the CLI without running a build step.
-    libexec.install "dist" if (buildpath/"dist").exist?
-
     # Use Language::Node helper to install node_modules into libexec in the Homebrew way.
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+
+    # If the repo includes a prebuilt dist/, copy it into the installed package directory
+    # so that bin/* scripts that do `require('../dist/...')` can find it.
+    if (buildpath/"dist").exist?
+      target = libexec/"lib/node_modules/md-changelog-linter"
+      target.mkpath
+      FileUtils.cp_r (buildpath/"dist"), target
+    end
 
     # Symlink executables
     bin.install_symlink Dir["#{libexec}/bin/*"]
